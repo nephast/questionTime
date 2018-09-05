@@ -12,6 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const routes = require('./src/routes');
 
 app.use('/api/v1/launch', routes.launch);
+app.use('/api/v1/intent', routes.intent);
 
 app.listen(port, () => {
   console.log(`SERVER RUNNING on ${port}`);
