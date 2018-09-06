@@ -25,6 +25,7 @@ async (req, res, next) => {
       return next(error)
     } 
     const userAnswer = req.body.intent.values[0].slot;
+    //herererere
     const checkAnswer = question.answers.filter(answer => answer.answer_id === userAnswer);
     if ( checkAnswer[0].is_answer === true ) {
       const {err: questionAnsweredErr, data: questionAnswered} = await UserControllers.updateAnsweredQuestion(req);

@@ -5,7 +5,7 @@ let { User } = require('../src/models');
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
-let server = require('../index');
+let server = require('..');
 let expect = chai.expect;
 
 chai.use(chaiHttp);
@@ -44,7 +44,7 @@ describe('Launch Request', () => {
       User.create(userPayloadNoAnswer);
       return done();
     });
-    it('it should post a launch request and return the question', () => {
+    it('should post a launch request and return the question', () => {
       return chai.request(server)
         .post('/api/v1/launch')
         .send(launchPayload) 
