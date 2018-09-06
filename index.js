@@ -17,3 +17,5 @@ app.use('/api/v1/question', routes.question);
 app.listen(PORT, () => {
   console.log(`SERVER RUNNING on ${PORT}`);
 });
+
+module.exports = app;

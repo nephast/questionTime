@@ -9,17 +9,19 @@ async (req, res, next) => {
 const { err: errUser, data: user} = await UserControllers.findUser(req);
 if (errUser) {
   const error = new Error();
+  res.status(500).json({ error: 'Something went wrong' });
   return next(error);
 }
 req.user = user;
 return next();
 },
 async (req, res, next) => {
-  //check if user answer is correct
+  //check if user's answer is correct
   try {
     const { err: questionErr, data: question } = await QuestionControllers.findLastQuestion(req)
     if (questionErr) {
       const error = new Error();
+      res.status(500).json({ error: 'Something went wrong' });
       return next(error)
     } 
     const userAnswer = req.body.intent.values[0].slot;
@@ -28,12 +30,13 @@ async (req, res, next) => {
       const {err: questionAnsweredErr, data: questionAnswered} = await UserControllers.updateAnsweredQuestion(req);
       if (questionAnsweredErr) {
         const error = new Error();
+        res.status(500).json({ error: 'Something went wrong' });
         return next(error)
       }
-      res.status(200).json({output: '<speak>That\'s right! Thanks for playing.</speak>'});
+      res.status(201).json({output: '<speak>That\'s right! Thanks for playing.</speak>'});
       return next();
     } 
-    res.status(200).json({output: '<speak>Sorry, wring answer.</speak>'});
+    res.status(200).json({output: '<speak>Sorry, wrong answer.</speak>'});
     return next();
   } catch (e) {
     console.log({ error: e });

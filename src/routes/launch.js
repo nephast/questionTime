@@ -17,7 +17,7 @@ if (randomQuestionErr) {
 },
 
 async (req, res, next) => {
-  // add question obj to array of questions if not already there
+  // add question object to user's array of questions if not already there
   const { err: addQuestionErr } = await UserControllers.addQuestionToUser(req, res, next);
   if (addQuestionErr) {
     const error = new Error();
@@ -25,7 +25,7 @@ async (req, res, next) => {
     return next(error);
   }
 
-   // update last question asked so we know later on which one to match the user answer
+   // update last question asked so we know later on which one to match to the user answer
   const { err: updatedQuestionErr, data: updatedQuestion } = await UserControllers.UpdateLastQuestion(req, res, next);
   if (updatedQuestionErr) {
     const error = new Error();
@@ -42,10 +42,10 @@ async (req, res, next) => {
     }
       if (alreadyAnswered.length === 0) {
         const answers = helpers.buildAnswers(req)
-        res.status(200).json({ output: `<speak>Welcome to Question Time! ${req.question.question} ${answers}</speak>` })
+        res.status(201).json({ output: `<speak>Welcome to Question Time! ${req.question.question} ${answers}</speak>` })
         return next();
       }
-      res.status(200).json({ output: '<speak>Welcome back to Question Time! Sorry, but you\'ve already answered the question</speak>' })
+      res.status(200).json({ output: '<speak>Welcome back to Question Time! Sorry, but you\'ve already answered the question.</speak>' })
       return next();
 } 
 );
