@@ -1,32 +1,35 @@
 const express = require('express');
 
 const router = express.Router();
-const { User, Question } = require('../models');
+const { UserControllers, QuestionControllers } = require('../controllers');
 
 router.post('/',
 async (req, res, next) => {
  //look for user in db
- try {
-  const user = await User.findOne({ user_id: req.body.userId });
-  req.user = user
-  return next();
- } catch (e) {
-   console.log({ error: e });
-   res.status(500).json({ error: 'an error occured' })  
- }  
+const { err: errUser, data: user} = await UserControllers.findUser(req);
+if (errUser) {
+  const error = new Error();
+  return next(error);
+}
+req.user = user;
+return next();
 },
 async (req, res, next) => {
   //check if user answer is correct
   try {
-    const lastQuestionAskedToUser = req.user.last_question;
-    const question = await Question.findOne({ question_id: lastQuestionAskedToUser });
+    const { err: questionErr, data: question } = await QuestionControllers.findLastQuestion(req)
+    if (questionErr) {
+      const error = new Error();
+      return next(error)
+    } 
     const userAnswer = req.body.intent.values[0].slot;
     const checkAnswer = question.answers.filter(answer => answer.answer_id === userAnswer);
     if ( checkAnswer[0].is_answer === true ) {
-      await User.update(
-        { user_id: req.user.user_id, 'questions.question_id': req.user.last_question},
-        { '$set': { 'questions.$.answered': true } }
-      )
+      const {err: questionAnsweredErr, data: questionAnswered} = await UserControllers.updateAnsweredQuestion(req);
+      if (questionAnsweredErr) {
+        const error = new Error();
+        return next(error)
+      }
       res.status(200).json({output: '<speak>That\'s right! Thanks for playing.</speak>'});
       return next();
     } 
@@ -34,7 +37,7 @@ async (req, res, next) => {
     return next();
   } catch (e) {
     console.log({ error: e });
-   res.status(500).json({ error: 'an error occured' })  
+   res.status(500).json({ error: 'Something went wrong' })  
   }
 }
 );

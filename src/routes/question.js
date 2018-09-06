@@ -1,10 +1,10 @@
 const express = require('express');
 
 const router = express.Router();
-const { Questions } = require('../models');
+const { Question } = require('../models');
 
 router.post('/', async (req, res, next) => {
-  const createQuestion = await Questions.create(req.body)
+  const createQuestion = await Question.create(req.body)
   return next(res.status(201).json({ created: createQuestion }));
 })
 
