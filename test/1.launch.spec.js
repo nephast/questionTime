@@ -1,12 +1,12 @@
 process.env.NODE_ENV = 'test';
 process.env.DB = 'mongodb://localhost/when-in-rome';
 
-let { User } = require('../src/models');
+const { User } = require('../src/models');
 
-let chai = require('chai');
-let chaiHttp = require('chai-http');
-let server = require('..');
-let expect = chai.expect;
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('..');
+const expect = chai.expect;
 
 chai.use(chaiHttp);
 
@@ -39,10 +39,9 @@ const userPayloadWithAnswer = {
 
 describe('Launch Request', () => {
   describe('/POST LAUNCH when player has NOT yet answer the question', async () => {
-    before((done) => {
-      User.collection.drop();
-      User.create(userPayloadNoAnswer);
-      return done();
+    before(async () => {
+      await User.collection.drop();
+      await User.create(userPayloadNoAnswer);
     });
     it('should post a launch request and return the question', () => {
       return chai.request(server)
@@ -55,17 +54,12 @@ describe('Launch Request', () => {
           expect(res.body.output).to.be.equal(questionOutput);
     })
   });
-  after((done) => {
-    User.collection.drop();
-    return done();
-  })
 }),
 
 describe('POST LAUNCH when player has answered the question', async () => {
-  before((done) => {
-    User.collection.drop();
-    User.create(userPayloadWithAnswer);
-    return done();
+  before(async () => {
+    await User.collection.drop();
+    await User.create(userPayloadWithAnswer);
   });
   it('it should post a launch request and return output saying question has been answered already', () => {
     return chai.request(server)
@@ -78,9 +72,9 @@ describe('POST LAUNCH when player has answered the question', async () => {
         expect(res.body.output).to.be.equal(sorryOutput);
       })
   })
-  after((done) => {
-    User.collection.drop();
-    return done();
-  })
+  // after((done) => {
+  //   User.collection.drop();
+  //   return done();
+  // })
 })
 });

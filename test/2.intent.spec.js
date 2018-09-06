@@ -1,12 +1,12 @@
 process.env.NODE_ENV = 'test';
 process.env.DB = 'mongodb://localhost/when-in-rome';
 
-let { User, Question } = require('../src/models');
+const { User, Question } = require('../src/models');
 
-let chai = require('chai');
-let chaiHttp = require('chai-http');
-let server = require('..');
-let expect = chai.expect;
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('..');
+const expect = chai.expect;
 
 const intentOutput = "<speak>That's right! Thanks for playing.</speak>"
 const intentPayload = { 
@@ -24,6 +24,33 @@ const intentPayload = {
 	}
 };
 
+const questionPayload = {
+	"question_id": "abcd",
+	"question": "Which of these is the largest?",
+	"answers": [
+			{
+				"answer_id": "a", 
+				"answer_text": "A. a tennis ball", 
+				"is_answer": false
+			},
+			{
+				"answer_id": "b",
+				"answer_text": "B. a bowling ball",
+				"is_answer": false
+      },
+      {
+				"answer_id": "c",
+				"answer_text": "C. a house",
+				"is_answer": false
+      },
+      {
+				"answer_id": "d",
+				"answer_text": "D. the sun",
+				"is_answer": true
+      }
+		]
+};
+
 const userPayload = {
   "user_id": "1234",
   "questions": [{
@@ -37,10 +64,11 @@ chai.use(chaiHttp);
 
 describe('Intent Request', () => {
   describe('/POST INTENT when player gave correct answer', async () => {
-    before((done) => {
-      User.collection.drop();
-      User.create(userPayload);
-      return done();
+    before(async () => {
+      await User.collection.drop();
+      await Question.collection.drop();
+      await User.create(userPayload);
+      await Question.create(questionPayload);
     });
     it('should post an intent request with correct answer to the question', () => {
       return chai.request(server)
@@ -53,9 +81,5 @@ describe('Intent Request', () => {
           expect(res.body.output).to.be.equal(intentOutput);
         })
     });
-    after((done) => {
-      User.collection.drop();
-      return done();
-    })
   })
 });
